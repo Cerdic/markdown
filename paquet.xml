@@ -1,7 +1,7 @@
 <paquet
 	prefix="markdown"
 	categorie="edition"
-	version="0.1.0"
+	version="0.2.0"
 	etat="experimental"
 	compatibilite="[3.0.0;3.0.*]"
 	logo="prive/themes/spip/images/markdown-32.png"
@@ -17,4 +17,6 @@
 
 	<licence>GNU/GPL</licence>
 
+	<pipeline nom="pre_typo" />
+	<pipeline nom="post_typo" />
 </paquet>
