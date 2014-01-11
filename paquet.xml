@@ -1,0 +1,21 @@
+<paquet
+	prefix="markdown"
+	categorie="edition"
+	version="0.1.0"
+	etat="experimental"
+	compatibilite="[3.0.0;3.0.*]"
+	logo="prive/themes/spip/images/markdown-64.png"
+	documentation=""
+>
+	<!--
+		Paquet genere le 2014-01-11 16:02:44
+	-->
+
+	<nom>Markdown</nom>
+
+	<auteur>Cédric</auteur>
+
+	<licence>GNU/GPL</licence>
+
+
+</paquet>
