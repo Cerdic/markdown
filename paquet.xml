@@ -4,7 +4,7 @@
 	version="0.1.0"
 	etat="experimental"
 	compatibilite="[3.0.0;3.0.*]"
-	logo="prive/themes/spip/images/markdown-64.png"
+	logo="prive/themes/spip/images/markdown-32.png"
 	documentation=""
 >
 	<!--
@@ -16,6 +16,5 @@
 	<auteur>Cédric</auteur>
 
 	<licence>GNU/GPL</licence>
-
 
 </paquet>
