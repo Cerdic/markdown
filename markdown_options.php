@@ -82,6 +82,8 @@ function markdown_raccourcis($texte){
 
 	// redresser les raccourcis liens moisis par les autoliens
 	$md = preg_replace_callback(",(\[[^]]*\])\((<a[^)]*</a>)\),Uims","markdown_link_repair",$texte);
+	// redresser les raccourcis liens moisis par espaces insecables et/ou autoliens
+	$md = preg_replace_callback(",^(\s*\[[^]]*\])(&nbsp;)?(:\s*?)(<a[^)]*</a>|[^<].*)$,Uims","markdown_link_repair2",$texte);
 
 	// parser le markdown
 	$md = Parsedown::instance()->parse($md);
@@ -93,6 +95,10 @@ function markdown_raccourcis($texte){
 function markdown_link_repair($r){
 	$href = extraire_attribut($r[2],"href");
 	return $r[1]."($href)";
+}
+function markdown_link_repair2($r){
+	$href = ((strpos($r[4],"<a")!==false)?extraire_attribut($r[4],"href"):$r[4]);
+	return $r[1].$r[3]."$href";
 }
 
 
