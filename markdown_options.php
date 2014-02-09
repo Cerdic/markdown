@@ -23,6 +23,7 @@ function traiter_echap_md_dist($regs){
 	// echapons le code dans le markdown
 	$texte = markdown_echappe_code($regs[3]);
 	$texte = markdown_echappe_liens($texte);
+	$texte = markdown_echappe_del($texte);
 	return "<md".$regs[2].">$texte</md>";
 }
 
@@ -39,14 +40,21 @@ function markdown_echappe_code($texte){
 		}
 	}
 
-
 	if (strpos($texte,"```")!==false OR strpos($texte,"~~~")!==false){
 		$texte = echappe_html($texte,'md',true,',^(```|~~~)\w*?\s.*\s(\1),Uims');
 	}
 	if (strpos($texte,"`")!==false){
 		$texte = echappe_html($texte,'md',true,',`.*`,Uims');
 	}
-	return "$texte";
+	return $texte;
+}
+
+function markdown_echappe_del($texte){
+	if (strpos($texte,"~~")!==false){
+		$texte = echappe_html($texte,'md',true,',~~,Uims');
+	}
+
+	return $texte;
 }
 
 function markdown_echappe_liens($texte){
@@ -56,7 +64,7 @@ function markdown_echappe_liens($texte){
 		foreach($matches as $match){
 			#var_dump($match);
 			$p = strpos($texte,$match[0])+strlen($match[1]);
-			$texte = substr_replace($texte,code_echappement($match[2], 'mdlinks', true),$p,strlen($match[2]));
+			$texte = substr_replace($texte,code_echappement($match[2], 'md', true),$p,strlen($match[2]));
 		}
 	}
 	//    [blabla]: http://....
@@ -65,7 +73,7 @@ function markdown_echappe_liens($texte){
 		foreach($matches as $match){
 			#var_dump($match);
 			$p = strpos($texte,$match[0])+strlen($match[1]);
-			$texte = substr_replace($texte,code_echappement($match[2], 'mdlinks', true),$p,strlen($match[2]));
+			$texte = substr_replace($texte,code_echappement($match[2], 'md', true),$p,strlen($match[2]));
 		}
 	}
 	// <http://...>
@@ -120,7 +128,7 @@ function markdown_pre_liens($texte){
 }
 
 /**
- * Pre typo : echapper le code pour le proteger des corrections typo
+ * Pre typo : echapper les ~~ pour ne pas les transformer en &nbsp;
  * @param string $texte
  * @return string
  */
@@ -135,7 +143,6 @@ function markdown_pre_typo($texte){
  */
 function markdown_post_typo($texte){
 	if (strpos($texte,"<md>")!==false){
-		$texte = echappe_retour($texte,"mdlinks");
 		$texte = echappe_retour($texte,"md");
 	}
 	return $texte;
