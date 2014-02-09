@@ -34,7 +34,7 @@ function markdown_echappe_code($texte){
 		if (!strlen(trim($match[2]))){
 			//var_dump($match[0]);
 			$p = strpos($texte,$match[0]);
-			$texte = substr_replace($texte,code_echappement($match[0], '', true),$p,strlen($match[0]));
+			$texte = substr_replace($texte,code_echappement($match[0], 'md', true),$p,strlen($match[0]));
 		}
 	}
 
@@ -143,7 +143,7 @@ function markdown_raccourcis($texte){
 		$md = preg_replace(",<(ul|ol|li)(\s),Uims","<$1 html$2",$md);
 
 	// tous les &truc; sont masques pour ne pas etre transformes en &amp;
-	//if (strpos($md,'&') !== false)
+	if (strpos($md,'&') !== false)
 	//	$md = preg_replace(',&(#?[a-z0-9]+;),iS', "\x1"."$1", $md);
 
 	// parser le markdown
