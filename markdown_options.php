@@ -14,6 +14,43 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 // s'inserer a la fin de pre_propre
 $GLOBALS['spip_pipeline']['pre_propre'] = (isset($GLOBALS['spip_pipeline']['pre_propre'])?$GLOBALS['spip_pipeline']['pre_propre']:'').'||markdown_pre_propre';
 
+// echapper les blocs <md>...</md> avant les autres blocs html
+define('_PROTEGE_BLOCS', ',<(md|html|code|cadre|frame|script)(\s[^>]*)?>(.*)</\1>,UimsS');
+define('_PROTEGE_BLOCS_SPIP', ',<(html|code|cadre|frame|script)(\s[^>]*)?>(.*)</\1>,UimsS');
+
+// fonction appelee par echappe_html sur les balises <md></md>
+function traiter_echap_md_dist($regs){
+	// echapons le code dans le markdown
+	$texte = markdown_echappe_code($regs[3]);
+	return "<md".$regs[2].">$texte</md>";
+}
+
+function markdown_echappe_code($texte){
+	$texte = echappe_retour($texte);
+	// tous les paragraphes indentes par 4 espaces ou une tabulation
+	// mais qui ne sont pas la suite d'une liste ou d'un blockquote
+	preg_match_all(",(^(    |\t|\*|\+|-|>|\d+\.)(.*)$(\s*^(    |\t).*$)*?),Uims",$texte,$matches,PREG_SET_ORDER);
+	foreach($matches as $match){
+		if (!strlen(trim($match[2]))){
+			//var_dump($match[0]);
+			$p = strpos($texte,$match[0]);
+			$texte = substr_replace($texte,code_echappement($match[0], '', true),$p,strlen($match[0]));
+		}
+	}
+
+
+	if (strpos($texte,"```")!==false){
+		//var_dump(preg_match(',^```\w+?\s.*\s```,Uims',$texte,$m));
+		//var_dump($m);
+		$texte = echappe_html($texte,'md',true,',^```\w+?\s.*\s```,Uims');
+	}
+	if (strpos($texte,"`")!==false){
+		$texte = echappe_html($texte,'md',true,',`.*`,Uims');
+	}
+	return "$texte";
+}
+
+
 /**
  * Appliquer un filtre aux portions <md>...</md> du texte
  * @param string $texte
@@ -32,24 +69,40 @@ function markdown_filtre_portions_md($texte,$filtre){
 	return $texte;
 }
 
+
+function markdown_pre_liens($texte){
+	// si pas de base64 dans le texte, rien a faire
+	if (strpos($texte,"base64")!==false) {
+		// on des-echappe : on recupere tout a l'identique
+		// sauf le code du markdown echappe
+		$texte = echappe_retour($texte);
+		// on reechappe les blocs html
+		// dans le code SPIP uniquement
+		// sans transformation cette fois, puisque deja faite
+		if (strpos($texte,"<md>")===false){
+			$texte = echappe_html($texte,'',true,_PROTEGE_BLOCS_SPIP);
+		}
+		else {
+			$splits = preg_split(",(<md>.*</md>),Uims",$texte,-1,PREG_SPLIT_DELIM_CAPTURE);
+			foreach($splits as $k=>$s){
+				if (strlen($s) AND strncmp($s,"<md>",4)!==0)
+					$splits[$k] = echappe_html($s,'',true,_PROTEGE_BLOCS_SPIP);
+			}
+			$texte = implode('',$splits);
+		}
+	}
+
+	// ici on a le html du code SPIP echappe, mais sans avoir touche au code MD qui est echappe aussi
+	return $texte;
+}
+
 /**
  * Pre typo : echapper le code pour le proteger des corrections typo
  * @param string $texte
  * @return string
  */
 function markdown_pre_typo($texte){
-	return markdown_filtre_portions_md($texte,"markdown_echappe_code");
-}
-function markdown_echappe_code($texte){
-	if (strpos($texte,"```")!==false){
-		//var_dump(preg_match(',^```\w+?\s.*\s```,Uims',$texte,$m));
-		//var_dump($m);
-		$texte = echappe_html($texte,'md',true,',^```\w+?\s.*\s```,Uims');
-	}
-	if (strpos($texte,"`")!==false){
-		$texte = echappe_html($texte,'md',true,',`.*`,Uims');
-	}
-	return "<md>$texte</md>";
+	return $texte;
 }
 
 /**
@@ -90,15 +143,17 @@ function markdown_raccourcis($texte){
 		$md = preg_replace(",<(ul|ol|li)(\s),Uims","<$1 html$2",$md);
 
 	// tous les &truc; sont masques pour ne pas etre transformes en &amp;
-	if (strpos($md,'&') !== false)
-		$md = preg_replace(',&(#?[a-z0-9]+;),iS', "\x1"."$1", $md);
+	//if (strpos($md,'&') !== false)
+	//	$md = preg_replace(',&(#?[a-z0-9]+;),iS', "\x1"."$1", $md);
 
 	// parser le markdown
 	$md = Parsedown::instance()->parse($md);
 
+	$md = corriger_toutes_entites_html($md);
+
 	// retablir les &
-	if (strpos($md,"\x1") !== false)
-		$md = str_replace("\x1","&", $md);
+	#if (strpos($md,"\x1") !== false)
+	#	$md = str_replace("\x1","&", $md);
 
 	// class spip sur ul et ol et retablir les ul/ol explicites d'origine
 	$md = str_replace(array("<ul>","<ol>","<li>"),array('<ul'.$GLOBALS['class_spip_plus'].'>','<ol'.$GLOBALS['class_spip_plus'].'>','<li'.$GLOBALS['class_spip'].'>'),$md);
