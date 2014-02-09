@@ -22,6 +22,7 @@ define('_PROTEGE_BLOCS_SPIP', ',<(html|code|cadre|frame|script)(\s[^>]*)?>(.*)</
 function traiter_echap_md_dist($regs){
 	// echapons le code dans le markdown
 	$texte = markdown_echappe_code($regs[3]);
+	$texte = markdown_echappe_liens($texte);
 	return "<md".$regs[2].">$texte</md>";
 }
 
@@ -48,6 +49,30 @@ function markdown_echappe_code($texte){
 	return "$texte";
 }
 
+function markdown_echappe_liens($texte){
+	//[blabla](http://...)
+	if (strpos($texte,"[")!==false){
+		preg_match_all(",(\[[^]]*\])(\([^)]*\)),Uims",$texte,$matches,PREG_SET_ORDER);
+		foreach($matches as $match){
+			#var_dump($match);
+			$p = strpos($texte,$match[0])+strlen($match[1]);
+			$texte = substr_replace($texte,code_echappement($match[2], 'mdlinks', true),$p,strlen($match[2]));
+		}
+	}
+	//    [blabla]: http://....
+	if (strpos($texte,"[")!==false){
+		preg_match_all(",^(\s*\[[^]]*\]: )(.*)$,Uims",$texte,$matches,PREG_SET_ORDER);
+		foreach($matches as $match){
+			#var_dump($match);
+			$p = strpos($texte,$match[0])+strlen($match[1]);
+			$texte = substr_replace($texte,code_echappement($match[2], 'mdlinks', true),$p,strlen($match[2]));
+		}
+	}
+	// <http://...>
+	$texte = echappe_html($texte,'md',true,',' . '<https?://[^<]*>'.',UimsS');
+
+	return $texte;
+}
 
 /**
  * Appliquer un filtre aux portions <md>...</md> du texte
@@ -110,6 +135,7 @@ function markdown_pre_typo($texte){
  */
 function markdown_post_typo($texte){
 	if (strpos($texte,"<md>")!==false){
+		$texte = echappe_retour($texte,"mdlinks");
 		$texte = echappe_retour($texte,"md");
 	}
 	return $texte;
@@ -131,10 +157,7 @@ function markdown_pre_propre($texte){
 }
 function markdown_raccourcis($texte){
 
-	// redresser les raccourcis liens moisis par les autoliens
-	$md = preg_replace_callback(",(\[[^]]*\])\((<a[^)]*</a>)\),Uims","markdown_link_repair",$texte);
-	// redresser les raccourcis liens moisis par espaces insecables et/ou autoliens
-	$md = preg_replace_callback(",^(\s*\[[^]]*\])(&nbsp;)?(:\s*?)(<a[^)]*</a>|[^<].*)$,Uims","markdown_link_repair2",$md);
+	$md = $texte;
 
 	// marker les ul/ol explicites qu'on ne veut pas modifier
 	if (stripos($md,"<ul")!==false OR stripos($md,"<ol")!==false OR stripos($md,"<li")!==false)
