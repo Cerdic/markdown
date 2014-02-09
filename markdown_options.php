@@ -39,10 +39,8 @@ function markdown_echappe_code($texte){
 	}
 
 
-	if (strpos($texte,"```")!==false){
-		//var_dump(preg_match(',^```\w+?\s.*\s```,Uims',$texte,$m));
-		//var_dump($m);
-		$texte = echappe_html($texte,'md',true,',^```\w+?\s.*\s```,Uims');
+	if (strpos($texte,"```")!==false OR strpos($texte,"~~~")!==false){
+		$texte = echappe_html($texte,'md',true,',^(```|~~~)\w*?\s.*\s(\1),Uims');
 	}
 	if (strpos($texte,"`")!==false){
 		$texte = echappe_html($texte,'md',true,',`.*`,Uims');
