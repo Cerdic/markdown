@@ -40,7 +40,7 @@
 			lire_fichier(substr($t,0,-3).".html",$expected);
 			$expected = str_replace("\r\n", "\n", $expected);
 			$expected = str_replace("\r", "\n", $expected);
-			$essais[] = array(
+			$essais[basename($t,".md")] = array(
 				$expected , "<md>$markdown</md>"
 			);
 		}
