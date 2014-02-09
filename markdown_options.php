@@ -142,18 +142,9 @@ function markdown_raccourcis($texte){
 	if (stripos($md,"<ul")!==false OR stripos($md,"<ol")!==false OR stripos($md,"<li")!==false)
 		$md = preg_replace(",<(ul|ol|li)(\s),Uims","<$1 html$2",$md);
 
-	// tous les &truc; sont masques pour ne pas etre transformes en &amp;
-	if (strpos($md,'&') !== false)
-	//	$md = preg_replace(',&(#?[a-z0-9]+;),iS', "\x1"."$1", $md);
-
 	// parser le markdown
 	$md = Parsedown::instance()->parse($md);
 
-	$md = corriger_toutes_entites_html($md);
-
-	// retablir les &
-	#if (strpos($md,"\x1") !== false)
-	#	$md = str_replace("\x1","&", $md);
 
 	// class spip sur ul et ol et retablir les ul/ol explicites d'origine
 	$md = str_replace(array("<ul>","<ol>","<li>"),array('<ul'.$GLOBALS['class_spip_plus'].'>','<ol'.$GLOBALS['class_spip_plus'].'>','<li'.$GLOBALS['class_spip'].'>'),$md);
