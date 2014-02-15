@@ -43,6 +43,9 @@ function markdown_echappe_code($texte){
 	if (strpos($texte,"```")!==false OR strpos($texte,"~~~")!==false){
 		$texte = echappe_html($texte,'md',true,',^(```|~~~)\w*?\s.*\s(\1),Uims');
 	}
+	if (strpos($texte,"``")!==false){
+		$texte = echappe_html($texte,'md',true,',``.*``,Uims');
+	}
 	if (strpos($texte,"`")!==false){
 		$texte = echappe_html($texte,'md',true,',`.*`,Uims');
 	}
