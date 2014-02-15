@@ -49,6 +49,12 @@ function markdown_echappe_code($texte){
 	if (strpos($texte,"`")!==false){
 		$texte = echappe_html($texte,'md',true,',`.*`,Uims');
 	}
+
+	// escaping
+	if (strpos($texte,"\\")!==false){
+		$texte = echappe_html($texte,'md',true,',\\\\[\\`*_{}\[\]\(\)>+.!-],Uims');
+	}
+
 	return $texte;
 }
 
