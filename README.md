@@ -7,7 +7,18 @@ Les corrections typographiques de SPIP (liées à la langue) sont appliquées dans 
 
 Les raccourcis de liens SPIP et les modèles sont interprétés dans le markdown,
 ce qui permet d'écrire des liens indifférement avec la syntaxe SPIP ou la syntaxe markdown
-(globalement fonctionnel, tests unitaires à écrire et à valider)
+(globalement fonctionnel, tests unitaires à écrire et à valider).
+
+### Tests unitaires
+
+Le plugin repose sur la librairie http://parsedown.org/ dont il reprend les tests unitaires qui sont tous valides
+dans un raccourci `<md>..</md>`, ce qui garanti qu'on ne perturbe pas la syntaxe MarkDown par la prise en charge
+de la typographie ainsi que des raccourcis de lien SPIP.
+
+Un jeu de test unitaire complémentaire assure que le corrections typographiques sont bien appliquées là et uniquement là
+où c'est attendu dans le texte au format MarkDown.
+
+Un troisième jeu de test unitaire reste à écrire sur la prise en charge des raccourcis de liens SPIP et des modèles dans le texte MarkDown.
 
 ### TODO
 Proposer un formulaire de configuration qui permette de choisir le fonctionnement du plugin :
