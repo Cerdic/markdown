@@ -9,7 +9,7 @@ Les raccourcis de liens SPIP et les modèles sont interprétés dans le markdown,
 ce qui permet d'écrire des liens indifférement avec la syntaxe SPIP ou la syntaxe markdown
 (globalement fonctionnel, tests unitaires à écrire et à valider)
 
-TODO :
+### TODO
 Proposer un formulaire de configuration qui permette de choisir le fonctionnement du plugin :
 - Appliquer la syntaxe SPIP par défaut et la syntaxe MarkDown dans les blocs `<md>..</md>`
 - Appliquer la syntaxe MarkDown par défaut et la syntaxe SPIP dans les blocs `<spip>..</spip>`
