@@ -31,10 +31,10 @@ function markdown_echappe_code($texte){
 	$texte = echappe_retour($texte);
 	// tous les paragraphes indentes par 4 espaces ou une tabulation
 	// mais qui ne sont pas la suite d'une liste ou d'un blockquote
-	preg_match_all(",(^(    |\t|\*|\+|-|>|\d+\.)(.*)$(\s*^(    |\t).*$)*?),Uims",$texte,$matches,PREG_SET_ORDER);
+	preg_match_all(",(^(    |\t|\* |\+ |- |> |\d+\.)(.*)$(\s*^(\s+|\t).*$)*?),Uims",$texte,$matches,PREG_SET_ORDER);
 	foreach($matches as $match){
 		if (!strlen(trim($match[2]))){
-			//var_dump($match[0]);
+			#var_dump($match[0]);
 			$p = strpos($texte,$match[0]);
 			$texte = substr_replace($texte,code_echappement($match[0], 'md', true),$p,strlen($match[0]));
 		}
