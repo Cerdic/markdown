@@ -7,7 +7,7 @@ Les corrections typographiques de SPIP (liées à la langue) sont appliquées dans 
 
 Les raccourcis de liens SPIP et les modèles sont interprétés dans le markdown,
 ce qui permet d'écrire des liens indifférement avec la syntaxe SPIP ou la syntaxe markdown
-(globalement fonctionnel, test suite à écrire)
+(globalement fonctionnel, tests unitaires à écrire et à valider)
 
 TODO :
 Proposer un formulaire de configuration qui permette de choisir le fonctionnement du plugin :
