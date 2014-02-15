@@ -67,22 +67,35 @@ function markdown_echappe_del($texte){
 }
 
 function markdown_echappe_liens($texte){
-	//[blabla](http://...)
-	if (strpos($texte,"[")!==false){
-		preg_match_all(",(\[[^]]*\])(\([^)]*\)),Uims",$texte,$matches,PREG_SET_ORDER);
+	//[blabla](http://...) et ![babla](http://...)
+	if (strpos($texte,"](")!==false){
+		preg_match_all(",([!]?\[[^]]*\])(\([^)]*\)),Uims",$texte,$matches,PREG_SET_ORDER);
+		foreach($matches as $match){
+			#var_dump($match);
+			$p = strpos($texte,$match[0]);
+			$pre = $match[1];
+			if (strncmp($pre,"!",1)==0){
+				$pre = code_echappement("!", 'md', true).substr($pre,1);
+			}
+			$texte = substr_replace($texte,$pre.code_echappement($match[2], 'md', true),$p,strlen($match[0]));
+		}
+	}
+	//    [blabla]: http://....
+	if (strpos($texte,"]:")!==false){
+		preg_match_all(",^(\s*\[[^]]*\])(:[ \t]+.*)$,Uims",$texte,$matches,PREG_SET_ORDER);
 		foreach($matches as $match){
 			#var_dump($match);
 			$p = strpos($texte,$match[0])+strlen($match[1]);
 			$texte = substr_replace($texte,code_echappement($match[2], 'md', true),$p,strlen($match[2]));
 		}
 	}
-	//    [blabla]: http://....
-	if (strpos($texte,"[")!==false){
-		preg_match_all(",^(\s*\[[^]]*\])(:[ \t]+.*)$,Uims",$texte,$matches,PREG_SET_ORDER);
+	// ![Markdown Logo][image]
+	if (strpos($texte,"![")!==false){
+		preg_match_all(",^(!\[[^]]*\])(\[[^]]*\])$,Uims",$texte,$matches,PREG_SET_ORDER);
 		foreach($matches as $match){
 			#var_dump($match);
-			$p = strpos($texte,$match[0])+strlen($match[1]);
-			$texte = substr_replace($texte,code_echappement($match[2], 'md', true),$p,strlen($match[2]));
+			$p = strpos($texte,$match[0]);
+			$texte = substr_replace($texte,code_echappement("!", 'md', true),$p,1);
 		}
 	}
 	// <http://...>
