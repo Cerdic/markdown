@@ -4,7 +4,7 @@
  *
  */
 
-	$test = 'markdown';
+	$test = 'parsedown';
 	$remonte = "../";
 	while (!is_dir($remonte."ecrire"))
 		$remonte = "../$remonte";
@@ -18,7 +18,7 @@
 	//
 	// hop ! on y va
 	//
-	$err = tester_fun('propre', essais_markdown());
+	$err = tester_fun('propre', essais_parsedown());
 	
 	// si le tableau $err est pas vide ca va pas
 	if ($err) {
@@ -28,9 +28,9 @@
 	echo "OK";
 	
 
-	function essais_markdown(){
+	function essais_parsedown(){
 
-		$tests = preg_files(_DIR_PLUGIN_MARKDOWN."tests/data/md/",'\.md$');
+		$tests = preg_files(_DIR_PLUGIN_MARKDOWN."lib/parsedown/tests/data/",'\.md$');
 
 		$markdown = $expected = "";
 		$essais = array ();

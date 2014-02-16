@@ -29,6 +29,7 @@ function traiter_echap_md_dist($regs){
 
 function markdown_echappe_code($texte){
 	$texte = echappe_retour($texte);
+
 	// tous les paragraphes indentes par 4 espaces ou une tabulation
 	// mais qui ne sont pas la suite d'une liste ou d'un blockquote
 	preg_match_all(",(^(    |\t|\* |\+ |- |> |\d+\.)(.*)$(\s*^(\s+|\t).*$)*?),Uims",$texte,$matches,PREG_SET_ORDER);
@@ -81,8 +82,8 @@ function markdown_echappe_liens($texte){
 		}
 	}
 	//    [blabla]: http://....
-	if (strpos($texte,"]:")!==false){
-		preg_match_all(",^(\s*\[[^]]*\])(:[ \t]+[^\s]*(\s+(\".*\"|'.*'|\(.*\)))?)$,Uims",$texte,$matches,PREG_SET_ORDER);
+	if (strpos($texte,"[")!==false){
+		preg_match_all(",^(\s*\[[^]]*\])(:[ \t]+[^\s]*(\s+(\".*\"|'.*'|\(.*\)))?)\s*$,Uims",$texte,$matches,PREG_SET_ORDER);
 		foreach($matches as $match){
 			#var_dump($match);
 			$p = strpos($texte,$match[0])+strlen($match[1]);
