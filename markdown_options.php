@@ -209,7 +209,7 @@ function markdown_pre_propre($texte){
 /**
  * Appliquer un filtre aux portions <md>...</md> du texte
  * utilise dans pre_propre()
- * 
+ *
  * @param string $texte
  * @param string $filtre
  * @return string
