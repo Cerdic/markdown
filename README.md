@@ -26,8 +26,12 @@ Un jeu de tests unitaires concerne la prise en charge des raccourcis de liens SP
 Un jeu de tests unitaires reste à écrire sur la prise en charge des modèles SPIP dans le texte MarkDown.
 
 ### TODO
-Proposer un formulaire de configuration qui permette de choisir le fonctionnement du plugin :
-- Appliquer la syntaxe SPIP par défaut et la syntaxe MarkDown dans les blocs `<md>..</md>`
-- Appliquer la syntaxe MarkDown par défaut et la syntaxe SPIP dans les blocs `<spip>..</spip>`
-  Cette dernière configuration est particulièrement intéressante dans le cadre d'un nouveau site
-  mais nécessiterait une migration des contenus d'un site existant.
+
+- Proposer un formulaire de configuration qui permette de choisir le fonctionnement du plugin :
+  - Appliquer la syntaxe SPIP par défaut et la syntaxe MarkDown dans les blocs `<md>..</md>`
+  - Appliquer la syntaxe MarkDown par défaut et la syntaxe SPIP dans les blocs `<spip>..</spip>`
+    Cette dernière configuration est particulièrement intéressante dans le cadre d'un nouveau site
+    mais nécessiterait une migration des contenus d'un site existant.
+
+- Adapter la prise en charge de la syntaxe dans le porte-plume (markitup est initialement conçu pour markdown
+  donc il s'agit surtout de pouvoir switcher de syntaxe manuellement ou automatiquement)
