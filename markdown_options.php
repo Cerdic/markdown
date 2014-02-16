@@ -131,26 +131,6 @@ function markdown_echappe_liens($texte){
 	return $texte;
 }
 
-
-
-/**
- * Appliquer un filtre aux portions <md>...</md> du texte
- * @param string $texte
- * @param string $filtre
- * @return string
- */
-function markdown_filtre_portions_md($texte,$filtre){
-	if (strpos($texte,"<md>")!==false){
-		preg_match_all(",<md>(.*)</md>,Uims",$texte,$matches,PREG_SET_ORDER);
-		foreach($matches as $m){
-			$t = $filtre($m[1]);
-			$p = strpos($texte,$m[1]);
-			$texte = substr_replace($texte,$t,$p-4,strlen($m[1])+9);
-		}
-	}
-	return $texte;
-}
-
 /**
  * Avant le traitemept typo et liens :
  * - des-echapper tous les blocs de _PROTEGE_BLOCS qui ont ete echappes au tout debut
@@ -222,6 +202,27 @@ function markdown_pre_propre($texte){
 	}
 
 	$texte = markdown_filtre_portions_md($texte,"markdown_raccourcis");
+	return $texte;
+}
+
+
+/**
+ * Appliquer un filtre aux portions <md>...</md> du texte
+ * utilise dans pre_propre()
+ * 
+ * @param string $texte
+ * @param string $filtre
+ * @return string
+ */
+function markdown_filtre_portions_md($texte,$filtre){
+	if (strpos($texte,"<md>")!==false){
+		preg_match_all(",<md>(.*)</md>,Uims",$texte,$matches,PREG_SET_ORDER);
+		foreach($matches as $m){
+			$t = $filtre($m[1]);
+			$p = strpos($texte,$m[1]);
+			$texte = substr_replace($texte,$t,$p-4,strlen($m[1])+9);
+		}
+	}
 	return $texte;
 }
 
