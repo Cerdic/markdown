@@ -224,39 +224,3 @@ function markdown_raccourcis($texte){
 	// echapper le markdown
 	return code_echappement($md);
 }
-function markdown_link_repair($r){
-	$href = extraire_attribut($r[2],"href");
-	return $r[1]."($href)";
-}
-function markdown_link_repair2($r){
-	$href = ((strpos($r[4],"<a")!==false)?extraire_attribut($r[4],"href"):$r[4]);
-	return $r[1].$r[3]."$href";
-}
-
-
-/*
- * DEBUG
-$apres = Parsedown::instance()->parse($texte);
-
-if (_request('var_dbmarkdown') AND $apres!==$texte){
-
-include_once _DIR_PLUGIN_MARKDOWN.'lib/finediff.php';
-$diff = new FineDiff($texte, $apres);
-var_dump($apres);
-echo "<style>
-del {
-background: none repeat scroll 0 0 #FFDDDD;
-color: #FF0000;
-text-decoration: none;
-}
-ins {
-background: none repeat scroll 0 0 #DDFFDD;
-color: #008000;
-text-decoration: none;
-}
-</style>";
-echo "<pre>".$diff->renderDiffToHTML()."</pre>";
-die();
-}*/
-
-?>
