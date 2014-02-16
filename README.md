@@ -23,7 +23,8 @@ où c'est attendu dans le texte au format MarkDown (Tests `markdown_typo`).
 
 Un jeu de tests unitaires concerne la prise en charge des raccourcis de liens SPIP dans le MarkDown (Tests `markdown_liens_spip`).
 
-Un jeu de tests unitaires reste à écrire sur la prise en charge des modèles SPIP dans le texte MarkDown.
+Deux jeux de tests unitaires concernent l'utilisation de modeles SPIP de type inline et block pris en charge MarkDown
+tout en préservant le paragraphage (cas typique des modeles de document).
 
 ### TODO
 

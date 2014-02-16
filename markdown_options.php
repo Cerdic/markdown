@@ -189,6 +189,12 @@ function markdown_raccourcis($texte){
 
 	$md = $texte;
 
+	// enlever les \n\n apres <div class="base64...."></div>
+	// et surtout le passer en <p> car ca perturbe moins Markdown
+	if (strpos($md,'<div class="base64')!==false){
+		$md = preg_replace(",(<div (class=\"base64[^>]*>)</div>)\n\n,Uims","<p \\2</p>",$md);
+	}
+
 	// marker les ul/ol explicites qu'on ne veut pas modifier
 	if (stripos($md,"<ul")!==false OR stripos($md,"<ol")!==false OR stripos($md,"<li")!==false)
 		$md = preg_replace(",<(ul|ol|li)(\s),Uims","<$1 html$2",$md);
@@ -201,7 +207,19 @@ function markdown_raccourcis($texte){
 	$md = str_replace(array("<ul>","<ol>","<li>"),array('<ul'.$GLOBALS['class_spip_plus'].'>','<ol'.$GLOBALS['class_spip_plus'].'>','<li'.$GLOBALS['class_spip'].'>'),$md);
 	$md = str_replace(array("<ul html","<ol html","<li html"),array('<ul','<ol','<li'),$md);
 
-	//var_dump($md);
+	// Si on avait des <p class="base64' les repasser en div
+	// et reparagrapher car MD n'est pas tres fort et fait de la soupe <p><div></div></p>
+	if (strpos($md,'<p class="base64')!==false){
+		$md = preg_replace(",(<p (class=\"base64[^>]*>)</p>),Uims","<div \\2</div>",$md);
+		$md = paragrapher($md);
+		if (_AUTO_BR AND strpos($md,_AUTOBR)!==false){
+			$md = str_replace(_AUTOBR,'',$md);
+		}
+		// et les doubles \n<p
+		if (strpos($md,">\n\n<p")!==false){
+			$md = str_replace(">\n\n<p",">\n<p",$md);
+		}
+	}
 
 	// echapper le markdown
 	return code_echappement($md);
