@@ -18,7 +18,7 @@
 	//
 	// hop ! on y va
 	//
-	$err = tester_fun('propre', essais_markdown_typo());
+	$err = tester_fun('propre', essais_markdown_liens_spip());
 	
 	// si le tableau $err est pas vide ca va pas
 	if ($err) {
@@ -28,7 +28,7 @@
 	echo "OK";
 	
 
-	function essais_markdown_typo(){
+	function essais_markdown_liens_spip(){
 
 		$tests = preg_files(_DIR_PLUGIN_MARKDOWN."tests/data/liens_spip/",'\.md$');
 
