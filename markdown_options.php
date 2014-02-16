@@ -15,10 +15,18 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 $GLOBALS['spip_pipeline']['pre_propre'] = (isset($GLOBALS['spip_pipeline']['pre_propre'])?$GLOBALS['spip_pipeline']['pre_propre']:'').'||markdown_pre_propre';
 
 // echapper les blocs <md>...</md> avant les autres blocs html
+// permet de prendre la main en tout debut de traitement, lors de l'echappement des <md></md>
 define('_PROTEGE_BLOCS', ',<(md|html|code|cadre|frame|script)(\s[^>]*)?>(.*)</\1>,UimsS');
+
+// echappement normal pour SPIP, que l'on refait ici
 define('_PROTEGE_BLOCS_SPIP', ',<(html|code|cadre|frame|script)(\s[^>]*)?>(.*)</\1>,UimsS');
 
-// fonction appelee par echappe_html sur les balises <md></md>
+/**
+ * fonction appelee par echappe_html sur les balises <md></md>
+ *
+ * @param array $regs
+ * @return string
+ */
 function traiter_echap_md_dist($regs){
 	// echapons le code dans le markdown
 	$texte = markdown_echappe_code($regs[3]);
@@ -27,6 +35,11 @@ function traiter_echap_md_dist($regs){
 	return "<md".$regs[2].">$texte</md>";
 }
 
+/**
+ * Echapper les blocs de code dans le MarkDown
+ * @param $texte
+ * @return string
+ */
 function markdown_echappe_code($texte){
 	$texte = echappe_retour($texte);
 
@@ -59,6 +72,12 @@ function markdown_echappe_code($texte){
 	return $texte;
 }
 
+/**
+ * Echapper les ~~ qui sont transformes en <del> par MarkDown
+ * mais en &nbsp; par la typo SPIP qui passe avant si on laisse tel quel
+ * @param string $texte
+ * @return string
+ */
 function markdown_echappe_del($texte){
 	if (strpos($texte,"~~")!==false){
 		$texte = echappe_html($texte,'md',true,',~~,Uims');
@@ -67,6 +86,13 @@ function markdown_echappe_del($texte){
 	return $texte;
 }
 
+/**
+ * Echapper les raccourcis de type lien dans MarkDown
+ * pour proterger les morceaux qui risquent d'etre modifies par la typo SPIP
+ * (URL, :,...)
+ * @param string $texte
+ * @return string
+ */
 function markdown_echappe_liens($texte){
 	//[blabla](http://...) et ![babla](http://...)
 	if (strpos($texte,"](")!==false){
@@ -105,6 +131,8 @@ function markdown_echappe_liens($texte){
 	return $texte;
 }
 
+
+
 /**
  * Appliquer un filtre aux portions <md>...</md> du texte
  * @param string $texte
@@ -123,7 +151,14 @@ function markdown_filtre_portions_md($texte,$filtre){
 	return $texte;
 }
 
-
+/**
+ * Avant le traitemept typo et liens :
+ * - des-echapper tous les blocs de _PROTEGE_BLOCS qui ont ete echappes au tout debut
+ * - re-echapper les blocs de _PROTEGE_BLOCS_SPIP dans tout le contenu SPIP (hors <md></md>)
+ *
+ * @param string $texte
+ * @return string
+ */
 function markdown_pre_liens($texte){
 	// si pas de base64 dans le texte, rien a faire
 	if (strpos($texte,"base64")!==false) {
@@ -150,8 +185,9 @@ function markdown_pre_liens($texte){
 	return $texte;
 }
 
+
 /**
- * Pre typo : echapper les ~~ pour ne pas les transformer en &nbsp;
+ * Pre typo : Rien a faire on dirait
  * @param string $texte
  * @return string
  */
@@ -159,10 +195,13 @@ function markdown_pre_typo($texte){
 	return $texte;
 }
 
+
 /**
- * Post typo : retablir le code md echappe en pre-typo
- * @param $texte
- * @return mixed
+ * Post typo : retablir les blocs de code dans le MarkDown
+ * qui ont ete echappes en pre-liens
+ * La on retrouve tout le contenu MarkDown initial, qui a beneficie des corrections typo
+ * @param string $texte
+ * @return string
  */
 function markdown_post_typo($texte){
 	if (strpos($texte,"<md>")!==false){
@@ -185,6 +224,13 @@ function markdown_pre_propre($texte){
 	$texte = markdown_filtre_portions_md($texte,"markdown_raccourcis");
 	return $texte;
 }
+
+
+/**
+ * Appliquer Markdown sur un morceau de texte
+ * @param $texte
+ * @return string
+ */
 function markdown_raccourcis($texte){
 
 	$md = $texte;
@@ -195,7 +241,7 @@ function markdown_raccourcis($texte){
 		$md = preg_replace(",(<div (class=\"base64[^>]*>)</div>)\n\n,Uims","<p \\2</p>",$md);
 	}
 
-	// marker les ul/ol explicites qu'on ne veut pas modifier
+	// marquer les ul/ol explicites qu'on ne veut pas modifier
 	if (stripos($md,"<ul")!==false OR stripos($md,"<ol")!==false OR stripos($md,"<li")!==false)
 		$md = preg_replace(",<(ul|ol|li)(\s),Uims","<$1 html$2",$md);
 
@@ -207,20 +253,21 @@ function markdown_raccourcis($texte){
 	$md = str_replace(array("<ul>","<ol>","<li>"),array('<ul'.$GLOBALS['class_spip_plus'].'>','<ol'.$GLOBALS['class_spip_plus'].'>','<li'.$GLOBALS['class_spip'].'>'),$md);
 	$md = str_replace(array("<ul html","<ol html","<li html"),array('<ul','<ol','<li'),$md);
 
-	// Si on avait des <p class="base64' les repasser en div
+	// Si on avait des <p class="base64"></p> les repasser en div
 	// et reparagrapher car MD n'est pas tres fort et fait de la soupe <p><div></div></p>
 	if (strpos($md,'<p class="base64')!==false){
 		$md = preg_replace(",(<p (class=\"base64[^>]*>)</p>),Uims","<div \\2</div>",$md);
 		$md = paragrapher($md);
+		// pas d'autobr introduit par paragrapher
 		if (_AUTO_BR AND strpos($md,_AUTOBR)!==false){
 			$md = str_replace(_AUTOBR,'',$md);
 		}
-		// et les doubles \n<p
+		// eviter les >\n\n<p : un seul \n
 		if (strpos($md,">\n\n<p")!==false){
 			$md = str_replace(">\n\n<p",">\n<p",$md);
 		}
 	}
 
-	// echapper le markdown
+	// echapper le markdown pour que SPIP n'y touche plus
 	return code_echappement($md);
 }
