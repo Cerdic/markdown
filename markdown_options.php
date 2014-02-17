@@ -201,7 +201,19 @@ function markdown_pre_propre($texte){
 		include_once _DIR_PLUGIN_MARKDOWN."lib/parsedown/Parsedown.php";
 	}
 
+	$mes_notes = "";
+	// traiter les notes ici si il y a du <md> pour avoir une numerotation coherente
+	if (strpos($texte,"<md>")!==false){
+		$notes = charger_fonction('notes', 'inc');
+		// Gerer les notes (ne passe pas dans le pipeline)
+		list($texte, $mes_notes) = $notes($texte);
+	}
+
 	$texte = markdown_filtre_portions_md($texte,"markdown_raccourcis");
+
+	if ($mes_notes)
+		$notes($mes_notes,'traiter');
+
 	return $texte;
 }
 
@@ -248,7 +260,6 @@ function markdown_raccourcis($texte){
 
 	// parser le markdown
 	$md = Parsedown::instance()->parse($md);
-
 
 	// class spip sur ul et ol et retablir les ul/ol explicites d'origine
 	$md = str_replace(array("<ul>","<ol>","<li>"),array('<ul'.$GLOBALS['class_spip_plus'].'>','<ol'.$GLOBALS['class_spip_plus'].'>','<li'.$GLOBALS['class_spip'].'>'),$md);

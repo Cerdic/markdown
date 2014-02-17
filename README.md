@@ -1,12 +1,15 @@
 ## MarkDown pour SPIP (experimental)
 
-Ce plugin permet d'utiliser la syntaxe markdown dans un article SPIP.
-Le texte à interpréter en markdown doit être entre `<md>...</md>`
+Ce plugin permet d'utiliser la syntaxe MarkDown dans un article SPIP.
+Le texte à interpréter en MarkDown doit être entre `<md>...</md>`
 
 Les corrections typographiques de SPIP (liées à la langue) sont appliquées dans le MarkDown.
 
-Les raccourcis de liens SPIP et les modèles sont interprétés dans le markdown,
-ce qui permet d'écrire des liens indifférement avec la syntaxe SPIP ou la syntaxe markdown
+Les raccourcis de liens SPIP et les modèles sont interprétés dans le MarkDown,
+ce qui permet d'écrire des liens indifférement avec la syntaxe SPIP ou la syntaxe MarkDown.
+
+Les raccourcis de notes de bas de page de SPIP sont également interprétés dans le MarkDown,
+les notes sont numérotées continuement, indépendamment qu'elles soient dans le SPIP ou dans le MarkDown.
 
 
 ### Tests unitaires
@@ -15,13 +18,13 @@ Le plugin repose sur la librairie http://parsedown.org/ dont il reprend les test
 dans un raccourci `<md>..</md>`, ce qui garanti qu'on ne perturbe pas la syntaxe MarkDown par la prise en charge
 de la typographie ainsi que des raccourcis de lien SPIP (Tests `parsedown`).
 
-Un jeu de tests complémentaire concerne aussi le respect de la syntaxe markdown, mais porte sur des cas limites
-générés par l'interaction entre le moteur SPIP et le moteur Parsedown (Tests `markdown`).
+Un jeu de tests complémentaire concerne aussi le respect de la syntaxe MarkDown, mais porte sur des cas limites
+générés par l'interaction entre le moteur SPIP et le moteur Parsedown (Tests `MarkDown`).
 
 Un jeu de tests unitaires assure que le corrections typographiques sont bien appliquées là et uniquement là
-où c'est attendu dans le texte au format MarkDown (Tests `markdown_typo`).
+où c'est attendu dans le texte au format MarkDown (Tests `MarkDown_typo`).
 
-Un jeu de tests unitaires concerne la prise en charge des raccourcis de liens SPIP dans le MarkDown (Tests `markdown_liens_spip`).
+Un jeu de tests unitaires concerne la prise en charge des raccourcis de liens SPIP dans le MarkDown (Tests `MarkDown_liens_spip`).
 
 Deux jeux de tests unitaires concernent l'utilisation de modeles SPIP de type inline et block pris en charge MarkDown
 tout en préservant le paragraphage (cas typique des modeles de document).
@@ -34,5 +37,5 @@ tout en préservant le paragraphage (cas typique des modeles de document).
     Cette dernière configuration est particulièrement intéressante dans le cadre d'un nouveau site
     mais nécessiterait une migration des contenus d'un site existant.
 
-- Adapter la prise en charge de la syntaxe dans le porte-plume (markitup est initialement conçu pour markdown
+- Adapter la prise en charge de la syntaxe dans le porte-plume (markitup est initialement conçu pour MarkDown
   donc il s'agit surtout de pouvoir switcher de syntaxe manuellement ou automatiquement)
