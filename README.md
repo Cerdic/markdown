@@ -11,6 +11,11 @@ ce qui permet d'écrire des liens indifférement avec la syntaxe SPIP ou la syntax
 Les raccourcis de notes de bas de page de SPIP sont également interprétés dans le MarkDown,
 les notes sont numérotées continuement, indépendamment qu'elles soient dans le SPIP ou dans le MarkDown.
 
+Un formulaire de configuration permet de choisir le fonctionnement du plugin :
+  - Appliquer la syntaxe SPIP par défaut et la syntaxe MarkDown dans les blocs `<md>..</md>`
+  - Appliquer la syntaxe MarkDown par défaut et la syntaxe SPIP dans les blocs `<spip>..</spip>`
+  Dans ce dernier cas les contenus existant ne sont pas migrés, et peuvent être rendus de manière incorrecte.
+
 
 ### Tests unitaires
 
@@ -31,11 +36,7 @@ tout en préservant le paragraphage (cas typique des modeles de document).
 
 ### TODO
 
-- Proposer un formulaire de configuration qui permette de choisir le fonctionnement du plugin :
-  - Appliquer la syntaxe SPIP par défaut et la syntaxe MarkDown dans les blocs `<md>..</md>`
-  - Appliquer la syntaxe MarkDown par défaut et la syntaxe SPIP dans les blocs `<spip>..</spip>`
-    Cette dernière configuration est particulièrement intéressante dans le cadre d'un nouveau site
-    mais nécessiterait une migration des contenus d'un site existant.
+- Proposer un scenario de migration des contenus d'un site existant pour utiliser la syntaxe MarkDown par defaut
 
 - Adapter la prise en charge de la syntaxe dans le porte-plume (markitup est initialement conçu pour MarkDown
   donc il s'agit surtout de pouvoir switcher de syntaxe manuellement ou automatiquement)
