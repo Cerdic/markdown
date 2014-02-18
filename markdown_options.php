@@ -21,6 +21,17 @@ define('_PROTEGE_BLOCS', ',<(md|html|code|cadre|frame|script)(\s[^>]*)?>(.*)</\1
 // echappement normal pour SPIP, que l'on refait ici
 define('_PROTEGE_BLOCS_SPIP', ',<(html|code|cadre|frame|script)(\s[^>]*)?>(.*)</\1>,UimsS');
 
+function markdown_pre_echappe_html_propre($texte){
+	// lever un flag pour dire que ce pipeline est bien OK
+	if (!defined('_pre_echappe_html_propre_ok'))
+		define('_pre_echappe_html_propre_ok',true);
+
+	// echapper les blocs <md>...</md> car on ne veut pas toucher au <html>, <code>, <script> qui sont dedans !
+	$texte = echappe_html($texte,"mdblocs",false,',<(md)(\s[^>]*)?>(.*)</\1>,UimsS');
+
+	return $texte;
+}
+
 /**
  * fonction appelee par echappe_html sur les balises <md></md>
  *
@@ -142,22 +153,31 @@ function markdown_echappe_liens($texte){
 function markdown_pre_liens($texte){
 	// si pas de base64 dans le texte, rien a faire
 	if (strpos($texte,"base64")!==false) {
-		// on des-echappe : on recupere tout a l'identique
-		// sauf le code du markdown echappe
-		$texte = echappe_retour($texte);
-		// on reechappe les blocs html
-		// dans le code SPIP uniquement
-		// sans transformation cette fois, puisque deja faite
-		if (strpos($texte,"<md>")===false){
-			$texte = echappe_html($texte,'',true,_PROTEGE_BLOCS_SPIP);
+		// si on est passe par le pipeline _pre_echappe_html_propre_ok
+		// il suffit de desechapper les blocs <md> (mais dont on a echappe le code)
+		if (defined('_pre_echappe_html_propre_ok')){
+			$texte = echappe_retour($texte,'mdblocs');
 		}
 		else {
-			$splits = preg_split(",(<md>.*</md>),Uims",$texte,-1,PREG_SPLIT_DELIM_CAPTURE);
-			foreach($splits as $k=>$s){
-				if (strlen($s) AND strncmp($s,"<md>",4)!==0)
-					$splits[$k] = echappe_html($s,'',true,_PROTEGE_BLOCS_SPIP);
+			// sinon un peu plus complique :
+			// on des-echappe : on recupere tout a l'identique
+			// sauf le code du markdown echappe
+			$texte = echappe_retour($texte);
+			// on reechappe les blocs html
+			// dans le code SPIP uniquement
+			// sans transformation cette fois, puisque deja faite
+			if (strpos($texte,"<md>")===false){
+				$texte = echappe_html($texte,'',true,_PROTEGE_BLOCS_SPIP);
 			}
-			$texte = implode('',$splits);
+			else {
+				$splits = preg_split(",(<md>.*</md>),Uims",$texte,-1,PREG_SPLIT_DELIM_CAPTURE);
+				foreach($splits as $k=>$s){
+					if (strlen($s) AND strncmp($s,"<md>",4)!==0)
+						$splits[$k] = echappe_html($s,'',true,_PROTEGE_BLOCS_SPIP);
+				}
+				$texte = implode('',$splits);
+			}
+
 		}
 	}
 
