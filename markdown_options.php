@@ -22,9 +22,30 @@ define('_PROTEGE_BLOCS', ',<(md|html|code|cadre|frame|script)(\s[^>]*)?>(.*)</\1
 define('_PROTEGE_BLOCS_SPIP', ',<(html|code|cadre|frame|script)(\s[^>]*)?>(.*)</\1>,UimsS');
 
 function markdown_pre_echappe_html_propre($texte){
-	// lever un flag pour dire que ce pipeline est bien OK
-	if (!defined('_pre_echappe_html_propre_ok'))
-		define('_pre_echappe_html_propre_ok',true);
+	static $syntaxe_defaut = null;
+
+	if (is_null($syntaxe_defaut)){
+		// lever un flag pour dire que ce pipeline est bien OK
+		if (!defined('_pre_echappe_html_propre_ok'))
+			define('_pre_echappe_html_propre_ok',true);
+		// on peut forcer par define, utile pour les tests unitaires
+		if (defined('_SYNTAXE_PAR_DEFAUT'))
+			$syntaxe_defaut = _SYNTAXE_PAR_DEFAUT;
+		else {
+			include_spip('inc/config');
+			$syntaxe_defaut = lire_config("markdown/syntaxe_par_defaut","spip");
+		}
+	}
+
+	// si syntaxe par defaut est markdown et pas de <md> dans le texte on les introduits
+	if ($syntaxe_defaut==="markdown"
+		// est-ce judicieux de tester cette condition ?
+	  AND strpos($texte,"<md>")===false
+	  ){
+		$texte = str_replace(array("<spip>","</spip>"),array("</md>","<md>"),$texte);
+		$texte = "<md>$texte</md>";
+		$texte = str_replace("<md></md>","",$texte);
+	}
 
 	// echapper les blocs <md>...</md> car on ne veut pas toucher au <html>, <code>, <script> qui sont dedans !
 	$texte = echappe_html($texte,"mdblocs",false,',<(md)(\s[^>]*)?>(.*)</\1>,UimsS');
