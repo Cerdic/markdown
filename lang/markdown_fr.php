@@ -17,6 +17,8 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'label_syntaxe_par_defaut_spip' => "Raccourcis SPIP (et utiliser MarkDown entre <tt>&lt;md&gt;...&lt;/md&gt;</tt>)",
 	'label_syntaxe_par_defaut_markdown' => "MarkDown (et utiliser les raccourcis SPIP entre <tt>&lt;spip&gt;...&lt;/spip&gt;</tt>)",
 
+	'label_hmini' => "Niveau de titre le plus haut",
+
 	'explication_syntaxe_par_defaut' => 'Attention, les contenus ne sont pas modifiés en base et changer de syntaxe par défaut risque de dégrader le rendu des textes existants qui ne seront plus interprétés correctement.',
 
 	// T

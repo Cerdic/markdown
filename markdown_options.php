@@ -11,8 +11,9 @@
 
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-// s'inserer a la fin de pre_propre
+// s'inserer a la fin de pre_propre et post propre
 $GLOBALS['spip_pipeline']['pre_propre'] = (isset($GLOBALS['spip_pipeline']['pre_propre'])?$GLOBALS['spip_pipeline']['pre_propre']:'').'||markdown_pre_propre';
+$GLOBALS['spip_pipeline']['post_propre'] = (isset($GLOBALS['spip_pipeline']['post_propre'])?$GLOBALS['spip_pipeline']['post_propre']:'').'||markdown_post_propre';
 
 // echapper les blocs <md>...</md> avant les autres blocs html
 // permet de prendre la main en tout debut de traitement, lors de l'echappement des <md></md>
@@ -29,8 +30,8 @@ function markdown_pre_echappe_html_propre($texte){
 		if (!defined('_pre_echappe_html_propre_ok'))
 			define('_pre_echappe_html_propre_ok',true);
 		// on peut forcer par define, utile pour les tests unitaires
-		if (defined('_SYNTAXE_PAR_DEFAUT'))
-			$syntaxe_defaut = _SYNTAXE_PAR_DEFAUT;
+		if (defined('_MARKDOWN_SYNTAXE_PAR_DEFAUT'))
+			$syntaxe_defaut = _MARKDOWN_SYNTAXE_PAR_DEFAUT;
 		else {
 			include_spip('inc/config');
 			$syntaxe_defaut = lire_config("markdown/syntaxe_par_defaut","spip");
@@ -244,7 +245,8 @@ function markdown_pre_propre($texte){
 
 	$mes_notes = "";
 	// traiter les notes ici si il y a du <md> pour avoir une numerotation coherente
-	if (strpos($texte,"<md>")!==false){
+	if (strpos($texte,"<md>")!==false
+	  AND strpos($texte,"[[")!==false){
 		$notes = charger_fonction('notes', 'inc');
 		// Gerer les notes (ne passe pas dans le pipeline)
 		list($texte, $mes_notes) = $notes($texte);
@@ -322,5 +324,53 @@ function markdown_raccourcis($texte){
 	}
 
 	// echapper le markdown pour que SPIP n'y touche plus
-	return code_echappement($md);
+	return code_echappement($md,"md");
+}
+
+/**
+ * @param $texte
+ * @return string
+ */
+function markdown_post_propre($texte){
+	static $hreplace=null;
+	static $hmini=null;
+	if (is_null($hreplace)){
+		$hreplace = false;
+		// on peut forcer par define, utile pour les tests unitaires
+		if (defined('_MARKDOWN_HMINI'))
+			$hmini = _MARKDOWN_HMINI;
+		else {
+			include_spip('inc/config');
+			$hmini = lire_config("markdown/hmini",1);
+		}
+		if ($hmini>1){
+			$hreplace = array();
+			for ($i=5;$i>=1;$i--){
+				$ir = min($i+1,6);
+				$hreplace[1]["<h$i"] = "<h$ir";
+				$hreplace[1]["</h$i"] = "</h$ir";
+				$ir = min($i+2,6);
+				$hreplace[2]["<h$i"] = "<h$ir";
+				$hreplace[2]["</h$i"] = "</h$ir";
+			}
+		}
+	}
+
+	if (strpos($texte,'<div class="base64md')!==false){
+		$texte = echappe_retour($texte,"md");
+	}
+
+	if ($hreplace AND strpos($texte,"</h")!==false){
+		// si on veut h3 au plus haut et qu'il y a des h1, on decale de 2 vers le bas
+		if ($hmini==3 AND strpos($texte,"</h1")){
+			$texte = str_replace(array_keys($hreplace[2]),array_values($hreplace[2]),$texte);
+		}
+		// sinon si on veut h2 et qu'il y a h1 ou si on veut h3 et qu'il y a h2, on decale de 1 vers le bas
+		elseif ( ($hmini==2 AND strpos($texte,"</h1"))
+			OR ($hmini==3 AND strpos($texte,"</h2")) ){
+			$texte = str_replace(array_keys($hreplace[1]),array_values($hreplace[1]),$texte);
+		}
+	}
+
+	return $texte;
 }

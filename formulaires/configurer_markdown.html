@@ -27,6 +27,19 @@
 				</div>
 				<p class="explication"><:markdown:explication_syntaxe_par_defaut:></p>
 			</li>
+			#SET{name,hmini}#SET{obli,''}#SET{defaut,'1'}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+			<li class="editer long_label editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+				<label for="#GET{name}">[(#GET{fl}|concat{':label_',#GET{name}}|_T)]</label>[
+				<span class='erreur_message'>(#GET{erreurs})</span>
+				]<select name="#GET{name}" class="select" id="#GET{name}">
+					#SET{val,1}
+					<option value="#GET{val}"[(#ENV{#GET{name},#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>&lt;h1&gt;...&lt;/h1&gt;</option>
+					#SET{val,2}
+					<option value="#GET{val}"[(#ENV{#GET{name},#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>&lt;h2&gt;...&lt;/h2&gt;</option>
+					#SET{val,3}
+					<option value="#GET{val}"[(#ENV{#GET{name},#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>&lt;h3&gt;...&lt;/h3&gt;</option>
+				</select>
+			</li>
 		</ul>
 
 		<input type="hidden" name="_meta_casier" value="markdown" />
