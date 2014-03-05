@@ -5,7 +5,7 @@
 	etat="experimental"
 	compatibilite="[3.0.0;3.0.*]"
 	logo="prive/themes/spip/images/markdown-32.png"
-	documentation=""
+	documentation="https://github.com/Cerdic/markdown/blob/master/README.md"
 >
 
 	<nom>Markdown</nom>
