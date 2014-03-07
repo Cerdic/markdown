@@ -14,6 +14,8 @@
 	$GLOBALS['spip_lang'] = 'en'; // corrections typo
 	$GLOBALS['class_spip_plus'] = '';
 	$GLOBALS['class_spip'] = '';
+	define('_MARKDOWN_HMINI',1);
+	define('_MARKDOWN_SYNTAXE_PAR_DEFAUT','spip');
 
 	//
 	// hop ! on y va
