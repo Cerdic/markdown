@@ -360,7 +360,10 @@ function markdown_post_propre($texte){
 		$texte = echappe_retour($texte,"md");
 	}
 
-	if ($hreplace AND strpos($texte,"</h")!==false){
+	// la globale $GLOBALS['markdown_inh_hreplace'] permet d'inhiber le replace
+	// utilisee dans le titrage automatique
+	if (!isset($GLOBALS['markdown_inh_hreplace'])
+		AND $hreplace AND strpos($texte,"</h")!==false){
 		// si on veut h3 au plus haut et qu'il y a des h1, on decale de 2 vers le bas
 		if ($hmini==3 AND strpos($texte,"</h1")){
 			$texte = str_replace(array_keys($hreplace[2]),array_values($hreplace[2]),$texte);
@@ -373,4 +376,43 @@ function markdown_post_propre($texte){
 	}
 
 	return $texte;
+}
+
+
+
+/**
+ * Determiner un titre automatique,
+ * a partir des champs textes de contenu
+ *
+ * @param array $champs_contenu
+ *   liste des champs contenu textuels
+ * @param array|null $c
+ *   tableau qui contient les valeurs des champs de contenu
+ *   si null on utilise les valeurs du POST
+ * @param int $longueur
+ *   longueur de coupe
+ * @return string
+ */
+function inc_titrer_contenu($champs_contenu, $c=null, $longueur=80){
+	// prendre la concatenation des champs texte
+	$t = "";
+	foreach($champs_contenu as $champ){
+		$t .= _request($champ,$c)."\n\n";
+	}
+
+	if ($t){
+		$GLOBALS['markdown_inh_hreplace'] = true;
+		include_spip("inc/texte");
+		$t = propre($t);
+		unset($GLOBALS['markdown_inh_hreplace']);
+		if (strpos($t,"</h1>")!==false
+		  AND preg_match(",<h1[^>]*>(.*)</h1>,Uims",$t,$m)){
+			$t = $m[1];
+		}
+		else {
+			$t = couper($t,$longueur,"...");
+		}
+	}
+
+	return $t;
 }
