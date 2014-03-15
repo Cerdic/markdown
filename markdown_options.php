@@ -15,12 +15,76 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 $GLOBALS['spip_pipeline']['pre_propre'] = (isset($GLOBALS['spip_pipeline']['pre_propre'])?$GLOBALS['spip_pipeline']['pre_propre']:'').'||markdown_pre_propre';
 $GLOBALS['spip_pipeline']['post_propre'] = (isset($GLOBALS['spip_pipeline']['post_propre'])?$GLOBALS['spip_pipeline']['post_propre']:'').'||markdown_post_propre';
 
-// echapper les blocs <md>...</md> avant les autres blocs html
-// permet de prendre la main en tout debut de traitement, lors de l'echappement des <md></md>
-define('_PROTEGE_BLOCS', ',<(md|html|code|cadre|frame|script)(\s[^>]*)?>(.*)</\1>,UimsS');
+/* Compat SPIP < 3.0.17 */
 
-// echappement normal pour SPIP, que l'on refait ici
-define('_PROTEGE_BLOCS_SPIP', ',<(html|code|cadre|frame|script)(\s[^>]*)?>(.*)</\1>,UimsS');
+// - pour $source voir commentaire infra (echappe_retour)
+// - pour $no_transform voir le filtre post_autobr dans inc/filtres
+// http://doc.spip.org/@echappe_html
+function echappe_html_3017($letexte, $source='', $no_transform=false,
+$preg='') {
+	if (!is_string($letexte) or !strlen($letexte))
+		return $letexte;
+
+	// si le texte recu est long PCRE risque d'exploser, on
+	// fait donc un mic-mac pour augmenter pcre.backtrack_limit
+	if (($len = strlen($letexte)) > 100000) {
+		if (!$old = @ini_get('pcre.backtrack_limit')) $old = 100000;
+		if ($len > $old) {
+			$a = @ini_set('pcre.backtrack_limit', $len);
+			spip_log("ini_set pcre.backtrack_limit=$len ($old)");
+		}
+	}
+
+	if (($preg OR strpos($letexte,"<")!==false)
+	  AND preg_match_all($preg ? $preg : _PROTEGE_BLOCS, $letexte, $matches, PREG_SET_ORDER)) {
+		foreach ($matches as $regs) {
+			// echappements tels quels ?
+			if ($no_transform) {
+				$echap = $regs[0];
+			}
+
+			// sinon les traiter selon le cas
+			else if (function_exists($f = 'traiter_echap_'.strtolower($regs[1])))
+				$echap = $f($regs);
+			else if (function_exists($f = $f.'_dist'))
+				$echap = $f($regs);
+
+			$p = strpos($letexte,$regs[0]);
+			$letexte = substr_replace($letexte,code_echappement($echap, $source, $no_transform),$p,strlen($regs[0]));
+		}
+	}
+
+	if ($no_transform)
+		return $letexte;
+
+	// Gestion du TeX
+	// code mort sauf si on a personalise _PROTEGE_BLOCS sans y mettre <math>
+	// eviter la rupture de compat en branche 3.0
+	// a supprimer en branche 3.1
+	if (strpos($preg ? $preg : _PROTEGE_BLOCS,'code')!==false){
+		if (strpos($letexte, "<math>") !== false) {
+			include_spip('inc/math');
+			$letexte = traiter_math($letexte, $source);
+		}
+	}
+
+	// Echapper le php pour faire joli (ici, c'est pas pour la securite)
+	// seulement si on a echappe les <script>
+	// (derogatoire car on ne peut pas faire passer < ? ... ? >
+	// dans une callback autonommee
+	if (strpos($preg ? $preg : _PROTEGE_BLOCS,'script')!==false){
+		if (strpos($letexte,"<"."?")!==false AND preg_match_all(',<[?].*($|[?]>),UisS',
+		$letexte, $matches, PREG_SET_ORDER))
+		foreach ($matches as $regs) {
+			$letexte = str_replace($regs[0],
+				code_echappement(highlight_string($regs[0],true), $source),
+				$letexte);
+		}
+	}
+
+	return $letexte;
+}
+/* Fin Compat SPIP < 3.0.17 */
 
 function markdown_pre_echappe_html_propre($texte){
 	static $syntaxe_defaut = null;
@@ -48,8 +112,17 @@ function markdown_pre_echappe_html_propre($texte){
 		$texte = str_replace("<md></md>","",$texte);
 	}
 
-	// echapper les blocs <md>...</md> car on ne veut pas toucher au <html>, <code>, <script> qui sont dedans !
-	$texte = echappe_html($texte,"mdblocs",false,',<(md)(\s[^>]*)?>(.*)</\1>,UimsS');
+	if (strpos($texte,"<md>")!==false){
+		// Compat SPIP <3.0.17
+		if (!function_exists("traiter_echap_math_dist")){
+			$texte = echappe_html_3017($texte,"mdblocs",false,',<(md)(\s[^>]*)?'.'>(.*)</\1>,UimsS');
+		}
+		else {
+			// echapper les blocs <md>...</md> car on ne veut pas toucher au <html>, <code>, <script> qui sont dedans !
+			$texte = echappe_html($texte,"mdblocs",false,',<(md)(\s[^>]*)?'.'>(.*)</\1>,UimsS');
+		}
+	}
+
 
 	return $texte;
 }
@@ -166,41 +239,16 @@ function markdown_echappe_liens($texte){
 
 /**
  * Avant le traitemept typo et liens :
- * - des-echapper tous les blocs de _PROTEGE_BLOCS qui ont ete echappes au tout debut
- * - re-echapper les blocs de _PROTEGE_BLOCS_SPIP dans tout le contenu SPIP (hors <md></md>)
+ * - des-echapper les blocs <md> qui ont ete echappes au tout debut
  *
  * @param string $texte
  * @return string
  */
 function markdown_pre_liens($texte){
 	// si pas de base64 dans le texte, rien a faire
-	if (strpos($texte,"base64")!==false) {
-		// si on est passe par le pipeline _pre_echappe_html_propre_ok
+	if (strpos($texte,"base64mdblocs")!==false) {
 		// il suffit de desechapper les blocs <md> (mais dont on a echappe le code)
-		if (defined('_pre_echappe_html_propre_ok')){
-			$texte = echappe_retour($texte,'mdblocs');
-		}
-		else {
-			// sinon un peu plus complique :
-			// on des-echappe : on recupere tout a l'identique
-			// sauf le code du markdown echappe
-			$texte = echappe_retour($texte);
-			// on reechappe les blocs html
-			// dans le code SPIP uniquement
-			// sans transformation cette fois, puisque deja faite
-			if (strpos($texte,"<md>")===false){
-				$texte = echappe_html($texte,'',true,_PROTEGE_BLOCS_SPIP);
-			}
-			else {
-				$splits = preg_split(",(<md>.*</md>),Uims",$texte,-1,PREG_SPLIT_DELIM_CAPTURE);
-				foreach($splits as $k=>$s){
-					if (strlen($s) AND strncmp($s,"<md>",4)!==0)
-						$splits[$k] = echappe_html($s,'',true,_PROTEGE_BLOCS_SPIP);
-				}
-				$texte = implode('',$splits);
-			}
-
-		}
+		$texte = echappe_retour($texte,'mdblocs');
 	}
 
 	// ici on a le html du code SPIP echappe, mais sans avoir touche au code MD qui est echappe aussi
@@ -356,9 +404,11 @@ function markdown_post_propre($texte){
 		}
 	}
 
+	// blocs <md></md> echappes
 	if (strpos($texte,'<div class="base64md')!==false){
 		$texte = echappe_retour($texte,"md");
 	}
+
 
 	// la globale $GLOBALS['markdown_inh_hreplace'] permet d'inhiber le replace
 	// utilisee dans le titrage automatique
