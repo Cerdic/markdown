@@ -289,6 +289,7 @@ function markdown_post_typo($texte){
 function markdown_pre_propre($texte){
 	if (!class_exists("Parsedown")){
 		include_once _DIR_PLUGIN_MARKDOWN."lib/parsedown/Parsedown.php";
+                include_once _DIR_PLUGIN_MARKDOWN."lib/parsedown/ParsedownExtra.php";
 	}
 
 	$mes_notes = "";
@@ -349,8 +350,9 @@ function markdown_raccourcis($texte){
 	if (stripos($md,"<ul")!==false OR stripos($md,"<ol")!==false OR stripos($md,"<li")!==false)
 		$md = preg_replace(",<(ul|ol|li)(\s),Uims","<$1 html$2",$md);
 
-	// parser le markdown
-	$md = Parsedown::instance()->parse($md);
+	// parser le markdown !
+	//$md = Parsedown::instance()->parse($md);
+        $md = ParsedownExtra::instance()->parse($md);
 
 	// class spip sur ul et ol et retablir les ul/ol explicites d'origine
 	$md = str_replace(array("<ul>","<ol>","<li>"),array('<ul'.$GLOBALS['class_spip_plus'].'>','<ol'.$GLOBALS['class_spip_plus'].'>','<li'.$GLOBALS['class_spip'].'>'),$md);
