@@ -371,9 +371,9 @@ function markdown_raccourcis($texte){
 	$md = $texte;
 
 	// enlever les \n\n apres <div class="base64...."></div>
-	// et surtout le passer en <p> car ca perturbe moins Markdown
+	// et surtout le passer en <span p ...> car ca perturbe moins Markdown
 	if (strpos($md,'<div class="base64')!==false){
-		$md = preg_replace(",(<div (class=\"base64[^>]*>)</div>)\n\n,Uims","<p \\2</p>",$md);
+		$md = preg_replace(",(<div (class=\"base64[^>]*>)</div>)\n\n,Uims","<span div \\2</span>",$md);
 	}
 
 	// marquer les ul/ol explicites qu'on ne veut pas modifier
@@ -389,8 +389,8 @@ function markdown_raccourcis($texte){
 
 	// Si on avait des <p class="base64"></p> les repasser en div
 	// et reparagrapher car MD n'est pas tres fort et fait de la soupe <p><div></div></p>
-	if (strpos($md,'<p class="base64')!==false){
-		$md = preg_replace(",(<p (class=\"base64[^>]*>)</p>),Uims","<div \\2</div>",$md);
+	if (strpos($md,'<span div class="base64')!==false){
+		$md = preg_replace(",(<span div (class=\"base64[^>]*>)</span>),Uims","<div \\2</div>",$md);
 		$md = paragrapher($md);
 		// pas d'autobr introduit par paragrapher
 		if (_AUTO_BR AND strpos($md,_AUTOBR)!==false){
