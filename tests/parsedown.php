@@ -16,6 +16,7 @@
 	$GLOBALS['class_spip'] = '';
 	define('_MARKDOWN_HMINI',1);
 	define('_MARKDOWN_SYNTAXE_PAR_DEFAUT','spip');
+	define('_MARKDOWN_PRESERVE_AUTOLIENS',true);
 
 	//
 	// hop ! on y va

@@ -248,6 +248,20 @@ function markdown_echappe_liens($texte){
 			$texte = substr_replace($texte,code_echappement("!", 'md', true),$p,1);
 		}
 	}
+
+	// les autoliens si option pour utiliser l'autolien MD plutot que l'autolien SPIP
+	if (defined('_MARKDOWN_PRESERVE_AUTOLIENS')) {
+		define('_SPIP_EXTRAIRE_LIENS', ',' . '\[[^\[\]]*(?:<-|->).*?\]' . '|<a\b.*?</a\b' . '|<\w.*?>' . '|((?:https?:/|www\.)[^"\'\s\[\]\}\)<>]*)' .',imsS');
+		preg_match_all(_SPIP_EXTRAIRE_LIENS,$texte,$matches,PREG_SET_ORDER);
+		foreach($matches as $match){
+			if (count($match)>1){
+				#var_dump($match);
+				$p = strpos($texte,$match[0]);
+				$texte = substr_replace($texte,code_echappement($match[0], 'md', true),$p,strlen($match[0]));
+			}
+		}
+	}
+
 	// <http://...>
 	$texte = echappe_html($texte,'md',true,',' . '<https?://[^<]*>'.',UimsS');
 
