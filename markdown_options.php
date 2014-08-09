@@ -134,6 +134,7 @@ function markdown_pre_echappe_html_propre($texte){
  * @return string
  */
 function traiter_echap_md_dist($regs){
+
 	// echapons le code dans le markdown
 	$texte = markdown_echappe_code($regs[3]);
 	$texte = markdown_echappe_liens($texte);
@@ -202,7 +203,23 @@ function markdown_echappe_del($texte){
 function markdown_echappe_liens($texte){
 	//[blabla](http://...) et ![babla](http://...)
 	if (strpos($texte,"](")!==false){
-		preg_match_all(",([!]?\[[^]]*\])(\([^)]*\)),Uims",$texte,$matches,PREG_SET_ORDER);
+		// D'abord les images ![babla](http://...)
+		// qui peuvent etre embarquees dans un lien
+		if (strpos($texte,"![")!==false){
+			preg_match_all(",([!]\[[^\]]*\])(\([^)]*\)),Uims",$texte,$matches,PREG_SET_ORDER);
+			foreach($matches as $match){
+				#var_dump($match);
+				$p = strpos($texte,$match[0]);
+				$ins = code_echappement("![", 'md', true)
+					.substr($match[1],2,-1)
+					.code_echappement("]", 'md', true)
+					.code_echappement($match[2], 'md', true);
+				$texte = substr_replace($texte,$ins,$p,strlen($match[0]));
+			}
+		}
+
+		// Puis les liens [blabla](http://...)
+		preg_match_all(",(\[[^\]]*\])(\([^)]*\)),Uims",$texte,$matches,PREG_SET_ORDER);
 		foreach($matches as $match){
 			#var_dump($match);
 			$p = strpos($texte,$match[0]);
