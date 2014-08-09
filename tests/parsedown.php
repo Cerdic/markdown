@@ -33,7 +33,7 @@
 
 	function essais_parsedown(){
 
-		$tests = preg_files(_DIR_PLUGIN_MARKDOWN."lib/parsedown/tests/data/",'\.md$');
+		$tests = preg_files(_DIR_PLUGIN_MARKDOWN."lib/parsedown/test/data/",'\.md$');
 
 		$markdown = $expected = "";
 		$essais = array ();
