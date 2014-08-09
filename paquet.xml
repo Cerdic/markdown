@@ -1,7 +1,7 @@
 <paquet
 	prefix="markdown"
 	categorie="edition"
-	version="0.12.2"
+	version="0.13.0"
 	etat="experimental"
 	compatibilite="[3.0.16;3.0.*]"
 	logo="prive/themes/spip/images/markdown-32.png"

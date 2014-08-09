@@ -1,5 +1,3 @@
-___em strong <a href="http://parsedown.org/" class='externallink'>Parsedown</a>___
-
 ___em strong <a href="http://parsedown.org/" class='external_link'>Parsedown</a>___
 
 ___em strong_ <a href="http://parsedown.org/" class='external_link'>Parsedown</a> strong__
