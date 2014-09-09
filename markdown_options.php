@@ -393,7 +393,7 @@ function markdown_raccourcis($texte){
 		$md = preg_replace(",(<span div (class=\"base64[^>]*>)</span>),Uims","<div \\2</div>",$md);
 		$md = paragrapher($md);
 		// pas d'autobr introduit par paragrapher
-		if (_AUTO_BR AND strpos($md,_AUTOBR)!==false){
+		if (_AUTOBR AND strpos($md,_AUTOBR)!==false){
 			$md = str_replace(_AUTOBR,'',$md);
 		}
 		// eviter les >\n\n<p : un seul \n
