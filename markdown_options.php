@@ -408,7 +408,7 @@ function markdown_raccourcis($texte){
 	}
 
 	// echapper le markdown pour que SPIP n'y touche plus
-	return code_echappement($md,"md");
+	return code_echappement($md,"md",false,"div");
 }
 
 /**
