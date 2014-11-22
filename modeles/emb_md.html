@@ -3,4 +3,4 @@
 	Variante Markdown du modèle <emb> du plugin Médias
 
 ]<BOUCLE_tous (DOCUMENTS types_documents) {id_document=#ID} {tout} {extension=md}
->[(#FICHIER|contenu_document{#ENV{charset,auto}}|wrap{'<md>'}|propre)]</BOUCLE_tous>
+>[(#FICHIER|contenu_document{#ENV{charset,auto}}|markdown_propre)]</BOUCLE_tous>
