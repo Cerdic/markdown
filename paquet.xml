@@ -1,9 +1,9 @@
 <paquet
 	prefix="markdown"
 	categorie="edition"
-	version="0.14.0"
+	version="0.15.0"
 	etat="experimental"
-	compatibilite="[3.0.16;3.0.*]"
+	compatibilite="[3.0.16;3.2.*]"
 	logo="prive/themes/spip/images/markdown-32.png"
 	documentation="https://github.com/Cerdic/markdown/blob/master/README.md"
 	schema="1.0.0"
