@@ -86,7 +86,7 @@ $preg='') {
 }
 /* Fin Compat SPIP < 3.0.17 */
 
-function markdown_pre_echappe_html_propre($texte){
+function markdown_syntaxe_defaut(){
 	static $syntaxe_defaut = null;
 
 	if (is_null($syntaxe_defaut)){
@@ -101,9 +101,14 @@ function markdown_pre_echappe_html_propre($texte){
 			$syntaxe_defaut = lire_config("markdown/syntaxe_par_defaut","spip");
 		}
 	}
+	return $syntaxe_defaut;
+}
+
+
+function markdown_pre_echappe_html_propre($texte){
 
 	// si syntaxe par defaut est markdown et pas de <md> dans le texte on les introduits
-	if ($syntaxe_defaut==="markdown"
+	if (markdown_syntaxe_defaut()==="markdown"
 		// est-ce judicieux de tester cette condition ?
 	  AND strpos($texte,"<md>")===false
 	  ){
@@ -403,7 +408,7 @@ function markdown_raccourcis($texte){
 	}
 
 	// echapper le markdown pour que SPIP n'y touche plus
-	return code_echappement($md,"md");
+	return code_echappement($md,"md",false,"div");
 }
 
 /**
@@ -459,7 +464,21 @@ function markdown_post_propre($texte){
 	return $texte;
 }
 
+/**
+ * Parser du markdown
+ *
+ * @param string $texte
+ * @return string
+ */
+function markdown_propre($texte){
+	if (markdown_syntaxe_defaut()==="spip"){
+		$texte = "<md>$texte</md>";
+	}
 
+	return propre($texte);
+
+	return $texte;
+}
 
 /**
  * Determiner un titre automatique,

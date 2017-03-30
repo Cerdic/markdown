@@ -2,7 +2,7 @@
 	prefix="markdown"
 	categorie="edition"
 	version="0.15.0"
-	etat="experimental"
+	etat="test"
 	compatibilite="[3.0.16;3.2.*]"
 	logo="prive/themes/spip/images/markdown-32.png"
 	documentation="https://github.com/Cerdic/markdown/blob/master/README.md"
