@@ -256,7 +256,9 @@ function markdown_echappe_liens($texte){
 
 	// les autoliens si option pour utiliser l'autolien MD plutot que l'autolien SPIP
 	if (defined('_MARKDOWN_PRESERVE_AUTOLIENS')) {
-		define('_SPIP_EXTRAIRE_LIENS', ',' . '\[[^\[\]]*(?:<-|->).*?\]' . '|<a\b.*?</a\b' . '|<\w.*?>' . '|((?:https?:/|www\.)[^"\'\s\[\]\}\)<>]*)' .',imsS');
+		if (!defined('_SPIP_EXTRAIRE_LIENS')) {
+			define('_SPIP_EXTRAIRE_LIENS', ',' . '\[[^\[\]]*(?:<-|->).*?\]' . '|<a\b.*?</a\b' . '|<\w.*?>' . '|((?:https?:/|www\.)[^"\'\s\[\]\}\)<>]*)' .',imsS');
+		}
 		preg_match_all(_SPIP_EXTRAIRE_LIENS,$texte,$matches,PREG_SET_ORDER);
 		foreach($matches as $match){
 			if (count($match)>1){
