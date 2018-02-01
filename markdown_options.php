@@ -399,6 +399,7 @@ function markdown_raccourcis($texte){
 	// et reparagrapher car MD n'est pas tres fort et fait de la soupe <p><div></div></p>
 	if (strpos($md,'<span div class="base64')!==false or strpos($md,'<div class="base64')!==false){
 		$md = preg_replace(",(<span div (class=\"base64[^>]*>)</span>),Uims","<div \\2</div>",$md);
+		$md = str_replace('<li>','<li><p>', $md);
 		$md = paragrapher($md);
 		// pas d'autobr introduit par paragrapher
 		if (_AUTOBR AND strpos($md,_AUTOBR)!==false){
