@@ -14,6 +14,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 // s'inserer a la fin de pre_propre et post propre
 $GLOBALS['spip_pipeline']['pre_propre'] = (isset($GLOBALS['spip_pipeline']['pre_propre'])?$GLOBALS['spip_pipeline']['pre_propre']:'').'||markdown_pre_propre';
 $GLOBALS['spip_pipeline']['post_propre'] = (isset($GLOBALS['spip_pipeline']['post_propre'])?$GLOBALS['spip_pipeline']['post_propre']:'').'||markdown_post_propre';
+$GLOBALS['spip_pipeline']['post_typo'] = (isset($GLOBALS['spip_pipeline']['post_propre'])?$GLOBALS['spip_pipeline']['post_propre']:'').'||markdown_post_typo';
 
 /* Compat SPIP < 3.0.17 */
 
