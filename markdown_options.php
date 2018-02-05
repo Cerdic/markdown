@@ -378,12 +378,6 @@ function markdown_raccourcis($texte){
 
 	$md = $texte;
 
-	// enlever les \n\n apres <div class="base64...."></div>
-	// et surtout le passer en <span p ...> car ca perturbe moins Markdown
-	if (strpos($md,'<div class="base64')!==false){
-		$md = preg_replace(",(<div (class=\"base64[^>]*>)</div>)\n\n,Uims","<span div \\2</span>",$md);
-	}
-
 	// marquer les ul/ol explicites qu'on ne veut pas modifier
 	if (stripos($md,"<ul")!==false OR stripos($md,"<ol")!==false OR stripos($md,"<li")!==false)
 		$md = preg_replace(",<(ul|ol|li)(\s),Uims","<$1 html$2",$md);
