@@ -10,6 +10,16 @@
 
 ###### h6 avec de la typo!
 
+####### not a heading avec de la typo!
+
 # closed h1 avec de la typo! #
 
 #
+
+##
+
+# # of levels avec de la typo!
+
+# # of levels avec de la typo! # #
+
+#heading avec de la typo!

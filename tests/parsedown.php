@@ -21,7 +21,7 @@
 	//
 	// hop ! on y va
 	//
-	$err = tester_fun('propre', essais_parsedown());
+	$err = tester_fun('propre_corrige', essais_parsedown());
 	
 	// si le tableau $err est pas vide ca va pas
 	if ($err) {
@@ -29,7 +29,13 @@
 	}
 
 	echo "OK";
-	
+
+	function propre_corrige($texte) {
+		$texte = propre($texte);
+		// les tests Parsedown ne prennent pas en compte les corrections typo de SPIP
+		$texte = str_replace("&#8217;", "'", $texte);
+		return $texte;
+	}
 
 	function essais_parsedown(){
 
@@ -39,6 +45,8 @@
 		$essais = array ();
 
 		foreach($tests as $t){
+			if (strpos(basename($t), 'xss_') === 0) continue;
+			if (strpos(basename($t), 'strict_') === 0) continue;
 			lire_fichier($t,$markdown);
 			lire_fichier(substr($t,0,-3).".html",$expected);
 			$expected = str_replace("\r\n", "\n", $expected);

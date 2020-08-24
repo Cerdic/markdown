@@ -10,6 +10,16 @@
 
 ###### h6 avec de la typo [SPIP->http://www.spip.net]
 
+####### not a heading avec de la typo [SPIP->http://www.spip.net]
+
 # closed h1 avec de la typo [SPIP->http://www.spip.net] #
 
 #
+
+##
+
+# # of levels
+
+# # of levels # #
+
+#heading

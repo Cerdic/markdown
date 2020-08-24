@@ -16,77 +16,6 @@ $GLOBALS['spip_pipeline']['pre_propre'] = (isset($GLOBALS['spip_pipeline']['pre_
 $GLOBALS['spip_pipeline']['post_propre'] = (isset($GLOBALS['spip_pipeline']['post_propre'])?$GLOBALS['spip_pipeline']['post_propre']:'').'||markdown_post_propre';
 $GLOBALS['spip_pipeline']['post_typo'] = (isset($GLOBALS['spip_pipeline']['post_propre'])?$GLOBALS['spip_pipeline']['post_propre']:'').'||markdown_post_typo';
 
-/* Compat SPIP < 3.0.17 */
-
-// - pour $source voir commentaire infra (echappe_retour)
-// - pour $no_transform voir le filtre post_autobr dans inc/filtres
-// http://doc.spip.org/@echappe_html
-function echappe_html_3017($letexte, $source='', $no_transform=false,
-$preg='') {
-	if (!is_string($letexte) or !strlen($letexte))
-		return $letexte;
-
-	// si le texte recu est long PCRE risque d'exploser, on
-	// fait donc un mic-mac pour augmenter pcre.backtrack_limit
-	if (($len = strlen($letexte)) > 100000) {
-		if (!$old = @ini_get('pcre.backtrack_limit')) $old = 100000;
-		if ($len > $old) {
-			$a = @ini_set('pcre.backtrack_limit', $len);
-			spip_log("ini_set pcre.backtrack_limit=$len ($old)");
-		}
-	}
-
-	if (($preg OR strpos($letexte,"<")!==false)
-	  AND preg_match_all($preg ? $preg : _PROTEGE_BLOCS, $letexte, $matches, PREG_SET_ORDER)) {
-		foreach ($matches as $regs) {
-			// echappements tels quels ?
-			if ($no_transform) {
-				$echap = $regs[0];
-			}
-
-			// sinon les traiter selon le cas
-			else if (function_exists($f = 'traiter_echap_'.strtolower($regs[1])))
-				$echap = $f($regs);
-			else if (function_exists($f = $f.'_dist'))
-				$echap = $f($regs);
-
-			$p = strpos($letexte,$regs[0]);
-			$letexte = substr_replace($letexte,code_echappement($echap, $source, $no_transform),$p,strlen($regs[0]));
-		}
-	}
-
-	if ($no_transform)
-		return $letexte;
-
-	// Gestion du TeX
-	// code mort sauf si on a personalise _PROTEGE_BLOCS sans y mettre <math>
-	// eviter la rupture de compat en branche 3.0
-	// a supprimer en branche 3.1
-	if (strpos($preg ? $preg : _PROTEGE_BLOCS,'code')!==false){
-		if (strpos($letexte, "<math>") !== false) {
-			include_spip('inc/math');
-			$letexte = traiter_math($letexte, $source);
-		}
-	}
-
-	// Echapper le php pour faire joli (ici, c'est pas pour la securite)
-	// seulement si on a echappe les <script>
-	// (derogatoire car on ne peut pas faire passer < ? ... ? >
-	// dans une callback autonommee
-	if (strpos($preg ? $preg : _PROTEGE_BLOCS,'script')!==false){
-		if (strpos($letexte,"<"."?")!==false AND preg_match_all(',<[?].*($|[?]>),UisS',
-		$letexte, $matches, PREG_SET_ORDER))
-		foreach ($matches as $regs) {
-			$letexte = str_replace($regs[0],
-				code_echappement(highlight_string($regs[0],true), $source),
-				$letexte);
-		}
-	}
-
-	return $letexte;
-}
-/* Fin Compat SPIP < 3.0.17 */
-
 function markdown_syntaxe_defaut(){
 	static $syntaxe_defaut = null;
 
@@ -119,14 +48,7 @@ function markdown_pre_echappe_html_propre($texte){
 	}
 
 	if (strpos($texte,"<md>")!==false){
-		// Compat SPIP <3.0.17
-		if (!function_exists("traiter_echap_math_dist")){
-			$texte = echappe_html_3017($texte,"mdblocs",false,',<(md)(\s[^>]*)?'.'>(.*)</\1>,UimsS');
-		}
-		else {
-			// echapper les blocs <md>...</md> car on ne veut pas toucher au <html>, <code>, <script> qui sont dedans !
-			$texte = echappe_html($texte,"mdblocs",false,',<(md)(\s[^>]*)?'.'>(.*)</\1>,UimsS');
-		}
+		$texte = echappe_html($texte,"mdblocs",false,',<(md)(\s[^>]*)?'.'>(.*)</\1>,UimsS');
 	}
 
 
