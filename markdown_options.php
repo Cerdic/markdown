@@ -101,7 +101,7 @@ function markdown_echappe_code($texte){
 
 	// escaping
 	if (strpos($texte,"\\")!==false){
-		$texte = echappe_html($texte,'md',true,',\\\\[\\`*_{}\[\]\(\)>+.!-],Uims');
+		$texte = echappe_html($texte,'md',true,',\\\\[\\`*_{}\[\]\(\)>+.!-~],Uims');
 	}
 
 	return $texte;
