@@ -67,6 +67,7 @@ function traiter_echap_md_dist($regs){
 	$texte = markdown_echappe_code($regs[3]);
 	$texte = markdown_echappe_liens($texte);
 	$texte = markdown_echappe_del($texte);
+	$texte = markdown_echappe_setext($texte);
 	return "<md".$regs[2].">$texte</md>";
 }
 
@@ -80,12 +81,14 @@ function markdown_echappe_code($texte){
 
 	// tous les paragraphes indentes par 4 espaces ou une tabulation
 	// mais qui ne sont pas la suite d'une liste ou d'un blockquote
-	preg_match_all(",(^(    |\t|\* |\+ |- |> |\d+\.)(.*)$(\s*^(\s+|\t).*$)*?),Uims",$texte,$matches,PREG_SET_ORDER);
-	foreach($matches as $match){
-		if (!strlen(trim($match[2]))){
-			#var_dump($match[0]);
-			$p = strpos($texte,$match[0]);
-			$texte = substr_replace($texte,code_echappement($match[0], 'md', true),$p,strlen($match[0]));
+	if (strpos($texte, "    ") !== false or strpos($texte, "\t") !== false) {
+		preg_match_all(",(^(    |\t|\* |\+ |- |> |\d+\.)([^\n]*)$(\s*^( +|\t).*$)*?),Uims",$texte,$matches,PREG_SET_ORDER);
+		foreach($matches as $match){
+			if (!strlen(trim($match[2]))){
+				#var_dump($match[0]);
+				$p = strpos($texte,$match[0]);
+				$texte = substr_replace($texte,code_echappement($match[0], 'md', true),$p,strlen($match[0]));
+			}
 		}
 	}
 
@@ -116,6 +119,21 @@ function markdown_echappe_code($texte){
 function markdown_echappe_del($texte){
 	if (strpos($texte,"~~")!==false){
 		$texte = echappe_html($texte,'md',true,',~~,Uims');
+	}
+
+	return $texte;
+}
+
+
+/**
+ * Echapper les -- qui servent a reperer un titre dans la convention setext
+ * mais sont transformes en &mdash; par spip
+ * @param string $texte
+ * @return string
+ */
+function markdown_echappe_setext($texte){
+	if (strpos($texte," --")!==false){
+		$texte = echappe_html($texte,'md',true,',^  ? ?--\s,Uims');
 	}
 
 	return $texte;
