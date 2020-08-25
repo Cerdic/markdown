@@ -1,11 +1,11 @@
 <paquet
 	prefix="markdown"
 	categorie="edition"
-	version="1.1.0"
+	version="1.1.1"
 	etat="test"
 	compatibilite="[3.1.0;3.3.*]"
 	logo="markdown-32.png"
-	documentation="https://github.com/Cerdic/markdown/blob/master/README.md"
+	documentation="https://git.spip.net/spip-contrib-extensions/markdown"
 	schema="1.0.0"
 >
 
