@@ -4,14 +4,16 @@
 	version="1.1.0"
 	etat="test"
 	compatibilite="[3.1.0;3.3.*]"
-	logo="prive/themes/spip/images/markdown-32.png"
+	logo="markdown-32.png"
 	documentation="https://github.com/Cerdic/markdown/blob/master/README.md"
 	schema="1.0.0"
 >
 
 	<nom>Markdown</nom>
 
-	<auteur>Cédric</auteur>
+	<auteur lien='https://www.nursit.com'>Cédric Morin</auteur>
+	<credit lien='https://github.com/Cerdic/parsedown/tree/dev/version_patchee_pour_plugin_spip'>erusev/parsedown 1.8.0-beta-7</credit>
+	<credit lien='https://github.com/dcurtis/markdown-mark'>Icon from dcurtis/markdown-mark</credit>
 
 	<licence>GNU/GPL</licence>
 
